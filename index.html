@@ -2,81 +2,84 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Punkte Zähler</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
+<meta charset="UTF-8">
+<title>Punkte Zähler</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  padding: 10px;
+}
 
-    .table-container {
-      overflow-x: auto; /* horizontal scrollen */
-      -webkit-overflow-scrolling: touch; /* sanftes Scrollen auf iOS */
-      margin-top: 15px;
-    }
+/* Scrollbare Tabelle */
+.table-container {
+  overflow-x: auto; /* horizontal scroll */
+  -webkit-overflow-scrolling: touch;
+  margin-top: 10px;
+}
 
-    table {
-      border-collapse: collapse;
-      width: max-content; /* so breit wie nötig */
-      min-width: 100%;   /* mindestens Bildschirmbreite */
-    }
+/* Tabelle selbst */
+table {
+  border-collapse: collapse;
+  width: max-content; /* so breit wie nötig */
+}
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-      min-width: 80px;
-      word-wrap: break-word;
-    }
+/* Zellen dünner machen */
+th, td {
+  border: 1px solid #ccc;
+  padding: 4px 6px; /* weniger Platz */
+  text-align: center;
+  min-width: 50px; /* kleiner */
+  word-wrap: break-word;
+  white-space: nowrap;
+}
 
-    input[type="number"] {
-      width: 100%;
-      max-width: 80px;
-      box-sizing: border-box;
-    }
+input[type="number"] {
+  width: 100%;
+  max-width: 50px;
+  box-sizing: border-box;
+  padding: 2px;
+}
 
-    th input {
-      width: 100%;
-      max-width: 100px;
-      text-align: center;
-      font-weight: bold;
-      box-sizing: border-box;
-    }
+th input {
+  width: 100%;
+  max-width: 70px;
+  text-align: center;
+  font-weight: bold;
+  box-sizing: border-box;
+  padding: 2px;
+}
 
-    .total {
-      font-weight: bold;
-      background-color: #f5f5f5;
-    }
+.total {
+  font-weight: bold;
+  background-color: #f5f5f5;
+}
 
-    .winner {
-      background-color: #b6f2b6 !important;
-    }
+.winner {
+  background-color: #b6f2b6 !important;
+}
 
-    button {
-      margin-top: 10px;
-      padding: 8px 12px;
-      margin-right: 10px;
-    }
+button {
+  margin-top: 10px;
+  padding: 6px 10px;
+  margin-right: 10px;
+  font-size: 14px;
+}
 
-    /* Responsive: kleinere Bildschirme */
-    @media screen and (max-width: 600px) {
-      th, td {
-        padding: 10px 5px;
-      }
-      input[type="number"] {
-        max-width: 60px;
-      }
-    }
-  </style>
+/* Responsive: kleine Bildschirme */
+@media screen and (max-width: 500px) {
+  th, td { padding: 3px 4px; min-width: 40px; }
+  input[type="number"] { max-width: 40px; padding: 1px; font-size: 12px; }
+  th input { max-width: 60px; font-size: 12px; }
+}
+</style>
 </head>
 <body>
 
 <h1>Punkteübersicht</h1>
 
 <label>
-  🎯 Spiel geht bis:
-  <input type="number" id="targetScore" value="100"> Punkte
+🎯 Spiel geht bis:
+<input type="number" id="targetScore" value="100"> Punkte
 </label>
 
 <div class="table-container">
@@ -95,76 +98,24 @@
 <button id="addRoundBtn">Neue Runde</button>
 
 <script>
-  // --- Daten ---
-  let players = [];
-  let roundCount = 0;
+let players = [];
+let roundCount = 0;
 
-  // --- Funktionen ---
-  function addPlayer(name = `Spieler ${players.length + 1}`) {
-    players.push({ name });
+function addPlayer(name = `Spieler ${players.length + 1}`) {
+  players.push({ name });
 
-    // Header
-    const th = document.createElement("th");
-    th.innerHTML = `<input value="${name}" oninput="renamePlayer(${players.length-1}, this.value)">`;
-    document.getElementById("headerRow").appendChild(th);
+  // Header
+  const th = document.createElement("th");
+  th.innerHTML = `<input value="${name}" oninput="renamePlayer(${players.length-1}, this.value)">`;
+  document.getElementById("headerRow").appendChild(th);
 
-    // Total
-    const td = document.createElement("td");
-    td.id = `total-${players.length-1}`;
-    td.innerText = "0";
-    document.getElementById("totalRow").appendChild(td);
+  // Total
+  const td = document.createElement("td");
+  td.id = `total-${players.length-1}`;
+  td.innerText = "0";
+  document.getElementById("totalRow").appendChild(td);
 
-    // Runden updaten
-    document.querySelectorAll("#rounds tr").forEach(row => {
-      const cell = document.createElement("td");
-      cell.innerHTML = `<input type="number" value="0" oninput="updateTotals()">`;
-      row.appendChild(cell);
-    });
-  }
-
-  function renamePlayer(index, name) {
-    players[index].name = name;
-  }
-
-  function addRound() {
-    roundCount++;
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${roundCount}</td>`;
-    players.forEach(() => {
-      const td = document.createElement("td");
-      td.innerHTML = `<input type="number" value="0" oninput="updateTotals()">`;
-      tr.appendChild(td);
-    });
-    document.getElementById("rounds").appendChild(tr);
-  }
-
-  function updateTotals() {
-    const target = Number(document.getElementById("targetScore").value);
-    players.forEach((_, index) => {
-      let sum = 0;
-      document.querySelectorAll(`#rounds tr td:nth-child(${index+2}) input`).forEach(input => {
-        sum += Number(input.value) || 0;
-      });
-      const totalCell = document.getElementById(`total-${index}`);
-      totalCell.innerText = sum;
-      if(target && sum >= target) {
-        totalCell.classList.add("winner");
-      } else {
-        totalCell.classList.remove("winner");
-      }
-    });
-  }
-
-  // --- Event Listener ---
-  document.getElementById("addPlayerBtn").addEventListener("click", addPlayer);
-  document.getElementById("addRoundBtn").addEventListener("click", addRound);
-
-  // --- Startwerte ---
-  addPlayer();
-  addPlayer();
-  addRound();
-</script>
-
-</body>
-</html>
-
+  // Bestehende Runden aktualisieren
+  document.querySelectorAll("#rounds tr").forEach(row => {
+    const cell = document.createElement("td");
+    cell.innerHTML = `<input type="number" value="0"
