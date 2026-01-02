@@ -20,33 +20,33 @@ body {
 /* Tabelle selbst */
 table {
   border-collapse: collapse;
-  width: max-content; /* so breit wie nötig */
+  width: auto; /* so breit wie nötig */
+  min-width: 100%; /* mindestens Bildschirmbreite */
 }
 
-/* Zellen dünner machen */
+/* Zellen */
 th, td {
   border: 1px solid #ccc;
-  padding: 4px 6px; /* weniger Platz */
+  padding: 6px 8px; /* kompakt, aber sichtbar */
   text-align: center;
-  min-width: 50px; /* kleiner */
-  word-wrap: break-word;
+  min-width: 60px; /* kleine, aber sichtbare Spalten */
   white-space: nowrap;
 }
 
 input[type="number"] {
   width: 100%;
-  max-width: 50px;
-  box-sizing: border-box;
+  max-width: 60px;
   padding: 2px;
+  box-sizing: border-box;
 }
 
 th input {
   width: 100%;
-  max-width: 70px;
+  max-width: 80px;
+  padding: 2px;
   text-align: center;
   font-weight: bold;
   box-sizing: border-box;
-  padding: 2px;
 }
 
 .total {
@@ -65,11 +65,11 @@ button {
   font-size: 14px;
 }
 
-/* Responsive: kleine Bildschirme */
+/* Kleine Bildschirme */
 @media screen and (max-width: 500px) {
-  th, td { padding: 3px 4px; min-width: 40px; }
-  input[type="number"] { max-width: 40px; padding: 1px; font-size: 12px; }
-  th input { max-width: 60px; font-size: 12px; }
+  th, td { padding: 4px 6px; min-width: 50px; }
+  input[type="number"] { max-width: 50px; font-size: 12px; }
+  th input { max-width: 70px; font-size: 12px; }
 }
 </style>
 </head>
@@ -118,4 +118,27 @@ function addPlayer(name = `Spieler ${players.length + 1}`) {
   // Bestehende Runden aktualisieren
   document.querySelectorAll("#rounds tr").forEach(row => {
     const cell = document.createElement("td");
-    cell.innerHTML = `<input type="number" value="0"
+    cell.innerHTML = `<input type="number" value="0" oninput="updateTotals()">`;
+    row.appendChild(cell);
+  });
+}
+
+function renamePlayer(index, name) {
+  players[index].name = name;
+}
+
+function addRound() {
+  roundCount++;
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td>${roundCount}</td>`;
+  players.forEach(() => {
+    const td = document.createElement("td");
+    td.innerHTML = `<input type="number" value="0" oninput="updateTotals()">`;
+    tr.appendChild(td);
+  });
+  document.getElementById("rounds").appendChild(tr);
+}
+
+function updateTotals() {
+  const target = Number(document.getElementById("targetScore").value);
+  players.forEach((_, index_
