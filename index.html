@@ -110,10 +110,11 @@
   let players = [];
   let roundCount = 0;
 
+  // --- Spieler hinzufügen ---
   function addPlayer(name = `Spieler ${players.length + 1}`) {
     players.push({ name });
 
-    // Header mit placeholder statt value
+    // Header mit placeholder
     const th = document.createElement("th");
     th.innerHTML = `<input placeholder="${name}" oninput="renamePlayer(${players.length-1}, this.value)">`;
     document.getElementById("headerRow").appendChild(th);
@@ -127,27 +128,30 @@
     // Bestehende Runden updaten
     document.querySelectorAll("#rounds tr").forEach(row => {
       const cell = document.createElement("td");
-      cell.innerHTML = `<input type="number" placeholder="0" oninput="updateTotals()">`;
+      cell.innerHTML = `<input type="number" placeholder="0" oninput="updateTotals(); moveToNext(this)">`;
       row.appendChild(cell);
     });
   }
 
+  // --- Spielername ändern ---
   function renamePlayer(index, name) {
     players[index].name = name;
   }
 
+  // --- Neue Runde ---
   function addRound() {
     roundCount++;
     const tr = document.createElement("tr");
     tr.innerHTML = `<td>${roundCount}</td>`;
     players.forEach(() => {
       const td = document.createElement("td");
-      td.innerHTML = `<input type="number" placeholder="0" oninput="updateTotals()">`;
+      td.innerHTML = `<input type="number" placeholder="0" oninput="updateTotals(); moveToNext(this)">`;
       tr.appendChild(td);
     });
     document.getElementById("rounds").appendChild(tr);
   }
 
+  // --- Totale aktualisieren ---
   function updateTotals() {
     const target = Number(document.getElementById("targetScore").value);
     players.forEach((_, index) => {
@@ -165,10 +169,22 @@
     });
   }
 
+  // --- Cursor springt automatisch zur nächsten Spieler-Spalte ---
+  function moveToNext(input) {
+    const tr = input.closest("tr");
+    const tds = Array.from(tr.querySelectorAll("td input"));
+    const index = tds.indexOf(input);
+    if(index >= 0 && index < tds.length - 1) {
+      tds[index + 1].focus();
+      tds[index + 1].select(); // markiert vorhandenen Inhalt
+    }
+  }
+
+  // --- Event Listener ---
   document.getElementById("addPlayerBtn").addEventListener("click", addPlayer);
   document.getElementById("addRoundBtn").addEventListener("click", addRound);
 
-  // Startwerte
+  // --- Startwerte ---
   addPlayer();
   addPlayer();
   addRound();
