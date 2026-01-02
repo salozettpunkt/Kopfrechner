@@ -1,4 +1,4 @@
-<h1>TEST</h1>
+<h1>Kopfrechner Salozettpunkts Spieleabende</h1>
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -15,7 +15,7 @@
       overflow-x: auto; /* horizontal scrollen */
       -webkit-overflow-scrolling: touch; /* sanftes Scrollen auf iOS */
       margin-top: 15px;
-      border: 1px solid #ccc; /* optional */
+      border: 1px solid #ccc; /* optional für Übersicht */
     }
 
     table {
@@ -36,15 +36,15 @@
       max-width: 100px;
       text-align: center;
       font-weight: bold;
-      font-size: 18px;   /* größere Schrift, kein Zoom auf Handy */
+      font-size: 18px;   /* größer, kein Zoom auf Handy */
       box-sizing: border-box;
     }
 
-    /* Zahleneingaben in den Runden */
+    /* Punktzahl-Inputs */
     input[type="number"] {
       width: 100%;
       max-width: 60px;
-      font-size: 16px;  /* ausreichend groß, kein Zoom auf Handy */
+      font-size: 16px;   /* ausreichend groß, kein Zoom auf Handy */
       box-sizing: border-box;
     }
 
@@ -113,21 +113,21 @@
   function addPlayer(name = `Spieler ${players.length + 1}`) {
     players.push({ name });
 
-    // Header
+    // Header mit placeholder statt value
     const th = document.createElement("th");
-    th.innerHTML = `<input value="${name}" oninput="renamePlayer(${players.length-1}, this.value)">`;
+    th.innerHTML = `<input placeholder="${name}" oninput="renamePlayer(${players.length-1}, this.value)">`;
     document.getElementById("headerRow").appendChild(th);
 
-    // Total
+    // Total-Zelle
     const td = document.createElement("td");
     td.id = `total-${players.length-1}`;
     td.innerText = "0";
     document.getElementById("totalRow").appendChild(td);
 
-    // Bestehende Runden aktualisieren
+    // Bestehende Runden updaten
     document.querySelectorAll("#rounds tr").forEach(row => {
       const cell = document.createElement("td");
-      cell.innerHTML = `<input type="number" value="0" oninput="updateTotals()">`;
+      cell.innerHTML = `<input type="number" placeholder="0" oninput="updateTotals()">`;
       row.appendChild(cell);
     });
   }
@@ -142,7 +142,7 @@
     tr.innerHTML = `<td>${roundCount}</td>`;
     players.forEach(() => {
       const td = document.createElement("td");
-      td.innerHTML = `<input type="number" value="0" oninput="updateTotals()">`;
+      td.innerHTML = `<input type="number" placeholder="0" oninput="updateTotals()">`;
       tr.appendChild(td);
     });
     document.getElementById("rounds").appendChild(tr);
