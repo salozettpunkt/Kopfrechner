@@ -5,14 +5,69 @@
   <meta charset="UTF-8">
   <title>Punkte Zähler</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    table { border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; min-width: 90px; }
-    input[type="number"] { width: 70px; }
-    th input { width: 80px; text-align: center; font-weight: bold; }
-    .total { font-weight: bold; background-color: #f5f5f5; }
-    .winner { background-color: #b6f2b6 !important; }
-    button { margin-top: 10px; padding: 8px 12px; margin-right: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .table-container {
+      overflow-x: auto; /* horizontal scrollen */
+      -webkit-overflow-scrolling: touch; /* sanftes Scrollen auf iOS */
+      margin-top: 15px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: max-content; /* so breit wie nötig */
+      min-width: 100%;   /* mindestens Bildschirmbreite */
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+      min-width: 80px;
+      word-wrap: break-word;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      max-width: 80px;
+      box-sizing: border-box;
+    }
+
+    th input {
+      width: 100%;
+      max-width: 100px;
+      text-align: center;
+      font-weight: bold;
+      box-sizing: border-box;
+    }
+
+    .total {
+      font-weight: bold;
+      background-color: #f5f5f5;
+    }
+
+    .winner {
+      background-color: #b6f2b6 !important;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      margin-right: 10px;
+    }
+
+    /* Responsive: kleinere Bildschirme */
+    @media screen and (max-width: 600px) {
+      th, td {
+        padding: 10px 5px;
+      }
+      input[type="number"] {
+        max-width: 60px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -24,15 +79,17 @@
   <input type="number" id="targetScore" value="100"> Punkte
 </label>
 
-<table id="scoreTable">
-  <thead>
-    <tr id="headerRow"><th>Runde</th></tr>
-  </thead>
-  <tbody id="rounds"></tbody>
-  <tfoot>
-    <tr class="total" id="totalRow"><td>Gesamt</td></tr>
-  </tfoot>
-</table>
+<div class="table-container">
+  <table id="scoreTable">
+    <thead>
+      <tr id="headerRow"><th>Runde</th></tr>
+    </thead>
+    <tbody id="rounds"></tbody>
+    <tfoot>
+      <tr class="total" id="totalRow"><td>Gesamt</td></tr>
+    </tfoot>
+  </table>
+</div>
 
 <button id="addPlayerBtn">Spieler hinzufügen</button>
 <button id="addRoundBtn">Neue Runde</button>
@@ -110,3 +167,4 @@
 
 </body>
 </html>
+
