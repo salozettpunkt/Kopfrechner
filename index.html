@@ -22,3 +22,157 @@
       border-collapse: collapse;
       white-space: nowrap; /* verhindert Umbrechen der Spalten */
     }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 10px; /* kompakt, aber sichtbar */
+      text-align: center;
+      min-width: 70px;   /* ausreichend breite Spalten */
+    }
+
+    /* Spielername-Inputs */
+    th input {
+      width: 100%;
+      max-width: 100px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;   /* größere Schrift, kein Zoom auf Handy */
+      box-sizing: border-box;
+    }
+
+    /* Zahleneingaben in den Runden */
+    input[type="number"] {
+      width: 100%;
+      max-width: 60px;
+      font-size: 16px;  /* ausreichend groß, kein Zoom auf Handy */
+      box-sizing: border-box;
+    }
+
+    /* Zielpunkte-Eingabe */
+    #targetScore {
+      font-size: 16px;
+      width: 80px;
+    }
+
+    .total {
+      font-weight: bold;
+      background-color: #f5f5f5;
+    }
+
+    .winner {
+      background-color: #b6f2b6 !important;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 6px 10px;
+      margin-right: 10px;
+      font-size: 14px;
+    }
+
+    /* Responsive: kleine Bildschirme */
+    @media screen and (max-width: 500px) {
+      th, td {
+        padding: 4px 6px;
+        min-width: 60px;
+      }
+      th input { font-size: 16px; max-width: 80px; }
+      input[type="number"] { font-size: 14px; max-width: 50px; }
+      #targetScore { font-size: 14px; width: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Punkteübersicht</h1>
+
+<label>
+  🎯 Spiel geht bis:
+  <input type="number" id="targetScore" value="100"> Punkte
+</label>
+
+<div class="table-container">
+  <table id="scoreTable">
+    <thead>
+      <tr id="headerRow"><th>Runde</th></tr>
+    </thead>
+    <tbody id="rounds"></tbody>
+    <tfoot>
+      <tr class="total" id="totalRow"><td>Gesamt</td></tr>
+    </tfoot>
+  </table>
+</div>
+
+<button id="addPlayerBtn">Spieler hinzufügen</button>
+<button id="addRoundBtn">Neue Runde</button>
+
+<script>
+  let players = [];
+  let roundCount = 0;
+
+  function addPlayer(name = `Spieler ${players.length + 1}`) {
+    players.push({ name });
+
+    // Header
+    const th = document.createElement("th");
+    th.innerHTML = `<input value="${name}" oninput="renamePlayer(${players.length-1}, this.value)">`;
+    document.getElementById("headerRow").appendChild(th);
+
+    // Total
+    const td = document.createElement("td");
+    td.id = `total-${players.length-1}`;
+    td.innerText = "0";
+    document.getElementById("totalRow").appendChild(td);
+
+    // Bestehende Runden aktualisieren
+    document.querySelectorAll("#rounds tr").forEach(row => {
+      const cell = document.createElement("td");
+      cell.innerHTML = `<input type="number" value="0" oninput="updateTotals()">`;
+      row.appendChild(cell);
+    });
+  }
+
+  function renamePlayer(index, name) {
+    players[index].name = name;
+  }
+
+  function addRound() {
+    roundCount++;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${roundCount}</td>`;
+    players.forEach(() => {
+      const td = document.createElement("td");
+      td.innerHTML = `<input type="number" value="0" oninput="updateTotals()">`;
+      tr.appendChild(td);
+    });
+    document.getElementById("rounds").appendChild(tr);
+  }
+
+  function updateTotals() {
+    const target = Number(document.getElementById("targetScore").value);
+    players.forEach((_, index) => {
+      let sum = 0;
+      document.querySelectorAll(`#rounds tr td:nth-child(${index+2}) input`).forEach(input => {
+        sum += Number(input.value) || 0;
+      });
+      const totalCell = document.getElementById(`total-${index}`);
+      totalCell.innerText = sum;
+      if(target && sum >= target) {
+        totalCell.classList.add("winner");
+      } else {
+        totalCell.classList.remove("winner");
+      }
+    });
+  }
+
+  document.getElementById("addPlayerBtn").addEventListener("click", addPlayer);
+  document.getElementById("addRoundBtn").addEventListener("click", addRound);
+
+  // Startwerte
+  addPlayer();
+  addPlayer();
+  addRound();
+</script>
+
+</body>
+</html>
