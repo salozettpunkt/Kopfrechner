@@ -15,7 +15,7 @@
       overflow-x: auto; /* horizontal scrollen */
       -webkit-overflow-scrolling: touch; /* sanftes Scrollen auf iOS */
       margin-top: 15px;
-      border: 1px solid #ccc; /* optional für Übersicht */
+      border: 1px solid #ccc;
     }
 
     table {
@@ -25,30 +25,27 @@
 
     th, td {
       border: 1px solid #ccc;
-      padding: 6px 10px; /* kompakt, aber sichtbar */
+      padding: 6px 10px;
       text-align: center;
-      min-width: 70px;   /* ausreichend breite Spalten */
+      min-width: 70px;
     }
 
-    /* Spielername-Inputs */
     th input {
       width: 100%;
       max-width: 100px;
       text-align: center;
       font-weight: bold;
-      font-size: 18px;   /* größer, kein Zoom auf Handy */
+      font-size: 18px;
       box-sizing: border-box;
     }
 
-    /* Punktzahl-Inputs */
     input[type="number"] {
       width: 100%;
       max-width: 60px;
-      font-size: 16px;   /* ausreichend groß, kein Zoom auf Handy */
+      font-size: 16px;
       box-sizing: border-box;
     }
 
-    /* Zielpunkte-Eingabe */
     #targetScore {
       font-size: 16px;
       width: 80px;
@@ -70,7 +67,6 @@
       font-size: 14px;
     }
 
-    /* Responsive: kleine Bildschirme */
     @media screen and (max-width: 500px) {
       th, td {
         padding: 4px 6px;
@@ -128,7 +124,7 @@
     // Bestehende Runden updaten
     document.querySelectorAll("#rounds tr").forEach(row => {
       const cell = document.createElement("td");
-      cell.innerHTML = `<input type="number" placeholder="0" oninput="updateTotals(); moveToNext(this)">`;
+      cell.innerHTML = `<input type="number" placeholder="0" oninput="updateTotals()" onkeydown="checkEnter(event, this)">`;
       row.appendChild(cell);
     });
   }
@@ -145,7 +141,7 @@
     tr.innerHTML = `<td>${roundCount}</td>`;
     players.forEach(() => {
       const td = document.createElement("td");
-      td.innerHTML = `<input type="number" placeholder="0" oninput="updateTotals(); moveToNext(this)">`;
+      td.innerHTML = `<input type="number" placeholder="0" oninput="updateTotals()" onkeydown="checkEnter(event, this)">`;
       tr.appendChild(td);
     });
     document.getElementById("rounds").appendChild(tr);
@@ -169,14 +165,16 @@
     });
   }
 
-  // --- Cursor springt automatisch zur nächsten Spieler-Spalte ---
-  function moveToNext(input) {
-    const tr = input.closest("tr");
-    const tds = Array.from(tr.querySelectorAll("td input"));
-    const index = tds.indexOf(input);
-    if(index >= 0 && index < tds.length - 1) {
-      tds[index + 1].focus();
-      tds[index + 1].select(); // markiert vorhandenen Inhalt
+  // --- Enter-Taste springt zum nächsten Spieler ---
+  function checkEnter(event, input) {
+    if (event.key === "Enter") {
+      const tr = input.closest("tr");
+      const tds = Array.from(tr.querySelectorAll("td input"));
+      const index = tds.indexOf(input);
+      if(index >= 0 && index < tds.length - 1) {
+        tds[index + 1].focus();
+        tds[index + 1].select();
+      }
     }
   }
 
