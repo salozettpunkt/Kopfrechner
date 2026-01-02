@@ -5,34 +5,108 @@
   <meta charset="UTF-8">
   <title>Punkte Zähler</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
+    body { font-family: Arial; padding: 20px; }
+    table { border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; min-width: 90px; }
+    input[type="number"] { width: 70px; }
+    th input { width: 80px; text-align: center; font-weight: bold; }
+    .total { font-weight: bold; background-color: #f5f5f5; }
+    .winner { background-color: #b6f2b6 !important; }
+    button { margin-top: 10px; padding: 8px 12px; margin-right: 10px; }
+  </style>
+</head>
+<body>
 
-    table {
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
+<h1>Punkteübersicht</h1>
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-      min-width: 90px;
-    }
+<label>
+  🎯 Spiel geht bis:
+  <input type="number" id="targetScore" value="100"> Punkte
+</label>
 
-    input[type="number"] {
-      width: 70px;
-    }
+<table id="scoreTable">
+  <thead>
+    <tr id="headerRow"><th>Runde</th></tr>
+  </thead>
+  <tbody id="rounds"></tbody>
+  <tfoot>
+    <tr class="total" id="totalRow"><td>Gesamt</td></tr>
+  </tfoot>
+</table>
 
-    th input {
-      width: 80px;
-      text-align: center;
-      font-weight: bold;
-    }
+<button id="addPlayerBtn">Spieler hinzufügen</button>
+<button id="addRoundBtn">Neue Runde</button>
 
-    .total {
-      font-weight: bold;
-      background-color: #f5f5f5;
-    }
+<script>
+  // --- Daten ---
+  let players = [];
+  let roundCount = 0;
+
+  // --- Funktionen ---
+  function addPlayer(name = `Spieler ${players.length + 1}`) {
+    players.push({ name });
+
+    // Header
+    const th = document.createElement("th");
+    th.innerHTML = `<input value="${name}" oninput="renamePlayer(${players.length-1}, this.value)">`;
+    document.getElementById("headerRow").appendChild(th);
+
+    // Total
+    const td = document.createElement("td");
+    td.id = `total-${players.length-1}`;
+    td.innerText = "0";
+    document.getElementById("totalRow").appendChild(td);
+
+    // Runden updaten
+    document.querySelectorAll("#rounds tr").forEach(row => {
+      const cell = document.createElement("td");
+      cell.innerHTML = `<input type="number" value="0" oninput="updateTotals()">`;
+      row.appendChild(cell);
+    });
+  }
+
+  function renamePlayer(index, name) {
+    players[index].name = name;
+  }
+
+  function addRound() {
+    roundCount++;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${roundCount}</td>`;
+    players.forEach(() => {
+      const td = document.createElement("td");
+      td.innerHTML = `<input type="number" value="0" oninput="updateTotals()">`;
+      tr.appendChild(td);
+    });
+    document.getElementById("rounds").appendChild(tr);
+  }
+
+  function updateTotals() {
+    const target = Number(document.getElementById("targetScore").value);
+    players.forEach((_, index) => {
+      let sum = 0;
+      document.querySelectorAll(`#rounds tr td:nth-child(${index+2}) input`).forEach(input => {
+        sum += Number(input.value) || 0;
+      });
+      const totalCell = document.getElementById(`total-${index}`);
+      totalCell.innerText = sum;
+      if(target && sum >= target) {
+        totalCell.classList.add("winner");
+      } else {
+        totalCell.classList.remove("winner");
+      }
+    });
+  }
+
+  // --- Event Listener ---
+  document.getElementById("addPlayerBtn").addEventListener("click", addPlayer);
+  document.getElementById("addRoundBtn").addEventListener("click", addRound);
+
+  // --- Startwerte ---
+  addPlayer();
+  addPlayer();
+  addRound();
+</script>
+
+</body>
+</html>
